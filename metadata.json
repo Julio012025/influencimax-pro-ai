@@ -1,0 +1,6 @@
+{
+  "name": "InfluenciMax AI - Predictive Influencer & Automation OS",
+  "description": "Plataforma avançada de marketing de influência com análise preditiva de dados de audiência, simulação de ROI por IA, automações autônomas e auditoria de criadores.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

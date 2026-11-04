@@ -57,16 +57,32 @@ export function PremiumSalesPageView({ onNavigateToApp, onOpenGatewayGuide, onOp
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [isAdLinksModalOpen, setIsAdLinksModalOpen] = useState(false);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [customDomain, setCustomDomain] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('inf_custom_domain') || 'https://influencimax-pro-ai.vercel.app';
+    }
+    return 'https://influencimax-pro-ai.vercel.app';
+  });
+
+  const handleUpdateDomain = (domain: string) => {
+    const cleaned = domain.trim().replace(/\/$/, '');
+    setCustomDomain(cleaned);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('inf_custom_domain', cleaned);
+    }
+  };
 
   const getBaseUrl = () => {
+    if (customDomain && customDomain.startsWith('http')) {
+      return customDomain;
+    }
     if (typeof window !== 'undefined' && window.location.origin) {
-      // In AI Studio, the active live development container is ais-dev-*
       if (window.location.origin.includes('ais-pre-')) {
         return window.location.origin.replace('ais-pre-', 'ais-dev-');
       }
       return window.location.origin;
     }
-    return 'https://ais-dev-fyetgbvvhhzmoj3ynge2qp-40261366679.us-west2.run.app';
+    return 'https://influencimax-pro-ai.vercel.app';
   };
 
   const copyToClipboard = (text: string, key: string) => {
@@ -1060,13 +1076,48 @@ export function PremiumSalesPageView({ onNavigateToApp, onOpenGatewayGuide, onOp
               </div>
             </div>
 
-            {/* Explanatory Banner about ais-dev vs ais-pre */}
-            <div className="p-3.5 bg-amber-950/20 border border-amber-500/30 rounded-xl text-xs space-y-1">
+            {/* Explanatory Banner about 404 error in browser */}
+            <div className="p-4 bg-amber-950/30 border border-amber-500/40 rounded-xl text-xs space-y-2">
               <div className="flex items-center gap-2 text-amber-400 font-bold font-mono">
-                <span>⚠️ ATENÇÃO COM O ENDEREÇO NA BARRA DO NAVEGADOR</span>
+                <span>⚠️ POR QUE O LINK AIS-PRE-... RETORNA "HTTP ERROR 404"?</span>
               </div>
-              <p className="text-[11px] text-[#C0C0C0] leading-relaxed">
-                O endereço oficial e ativo da sua aplicação é <strong>https://ais-dev-fyetgbvvhhzmoj3ynge2qp-40261366679.us-west2.run.app/?tab=landing</strong> (com o prefixo <strong className="text-emerald-400">ais-dev-</strong>). Caso acesse ou copie com <strong className="text-rose-400">ais-pre-</strong>, o Cloud Run retornará <strong>HTTP ERROR 404</strong> pois esse host não existe. Todos os botões abaixo já copiam o link 100% correto e funcional.
+              <p className="text-[12px] text-[#D4D4D4] leading-relaxed">
+                O endereço <code className="text-rose-400 bg-black/40 px-1 py-0.5 rounded font-mono">ais-pre-*.run.app</code> é um <strong>túnel interno temporário do Google AI Studio</strong>, restrito à sua sessão de desenvolvimento. Ele <strong>não é um site público</strong> e o Google Cloud bloqueia com <strong>404</strong> caso seja colado em outra aba ou acessado por visitantes externos.
+              </p>
+              <div className="p-2.5 bg-black/40 rounded-lg border border-amber-500/20 text-[11px] text-[#A0A0A0] space-y-1">
+                <span className="text-emerald-400 font-bold font-mono block">✅ SOLUÇÃO DEFINITIVA PARA ANÚNCIOS:</span>
+                Como seu código já está 100% no seu GitHub (<strong className="text-white">Julio012025/influencimax-pro-ai</strong>), basta fazer o deploy gratuito na <strong>Vercel</strong> para ter seu link permanente oficial (ex: <code className="text-cyan-300">influencimax-pro-ai.vercel.app</code> ou seu domínio próprio <code className="text-cyan-300">seusite.com.br</code>).
+              </div>
+            </div>
+
+            {/* Configurar Domínio Oficial de Produção */}
+            <div className="p-4 rounded-xl bg-[#141414] border border-cyan-500/30 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-white flex items-center gap-1.5 font-mono">
+                  <Building2 className="w-4 h-4 text-cyan-400" />
+                  Domínio Oficial para seus Anúncios (Vercel ou Próprio)
+                </span>
+                <span className="text-[10px] text-cyan-400 font-mono bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">
+                  Atualiza todos os links abaixo
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <input 
+                  type="text" 
+                  value={customDomain}
+                  onChange={(e) => handleUpdateDomain(e.target.value)}
+                  placeholder="https://influencimax-pro-ai.vercel.app ou https://seusite.com.br"
+                  className="bg-[#080808] border border-[#333333] focus:border-cyan-400 text-xs text-white font-mono flex-1 px-3 py-2 rounded-lg outline-none"
+                />
+                <button
+                  onClick={() => handleUpdateDomain(customDomain)}
+                  className="px-3 py-2 bg-[#222222] hover:bg-[#333333] text-white text-xs font-mono rounded-lg transition-all"
+                >
+                  Salvar
+                </button>
+              </div>
+              <p className="text-[10px] text-[#888888] font-mono">
+                Dica: Digite o link da Vercel ou seu domínio com <code className="text-cyan-400">https://</code>. Todos os links com UTMs abaixo serão atualizados em tempo real.
               </p>
             </div>
 
@@ -1183,6 +1234,24 @@ export function PremiumSalesPageView({ onNavigateToApp, onOpenGatewayGuide, onOp
                   {`${getBaseUrl()}?tab=landing&utm_source=instagram&utm_medium=bio`}
                 </div>
               </div>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-gradient-to-r from-emerald-950/30 to-cyan-950/30 border border-emerald-500/30 space-y-2 text-xs">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-white flex items-center gap-1.5 font-mono">
+                  <ExternalLink className="w-4 h-4 text-emerald-400" />
+                  Passo a Passo: Como Ativar seu Link Público na Vercel (Gratuito)
+                </span>
+                <span className="text-[10px] text-emerald-400 font-mono bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                  Leva 2 minutos
+                </span>
+              </div>
+              <ol className="list-decimal list-inside text-[11px] text-[#CCCCCC] space-y-1 font-mono">
+                <li>Acesse <strong>vercel.com</strong> e faça login com seu GitHub (<code className="text-cyan-300">Julio012025</code>).</li>
+                <li>Clique em <strong>"Add New..." → "Project"</strong> e selecione o repositório <strong>influencimax-pro-ai</strong>.</li>
+                <li>Clique em <strong>"Deploy"</strong>. A Vercel criará seu link público oficial (ex: <code className="text-emerald-300">influencimax-pro-ai.vercel.app</code>).</li>
+                <li>Cole esse link no campo "Domínio Oficial" acima para gerar todos os links de anúncio!</li>
+              </ol>
             </div>
 
             <div className="p-3 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-300 space-y-1 font-mono">
